@@ -1,0 +1,194 @@
+\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage[final,pagenumbers]{assets/cvpr}
+
+% Include other packages here, before hyperref.
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+
+\usepackage[pagebackref,breaklinks,colorlinks]{hyperref}
+
+
+% Support for easy cross-referencing
+\usepackage[capitalize]{cleveref}
+\crefname{section}{Sec.}{Secs.}
+\Crefname{section}{Section}{Sections}
+\Crefname{table}{Table}{Tables}
+\crefname{table}{Tab.}{Tabs.}
+
+\begin{document}
+
+\title{Comparative Analysis of Class introduced and External Methods for Classification}
+
+\author{Evan Donovan\\
+  Boston University\\
+  {\tt\small donovan@bu.edu}
+  \and
+  Mitchell Gilmore\\
+  Boston University\\
+  {\tt\small mgilm0re@bu.edu}
+  \and
+  William Harrington\\
+  Boston University\\
+  {\tt\small harriw5@bu.edu}
+}
+\maketitle
+
+%%%%%%%%% BODY TEXT
+\section{Introduction}
+\label{sec:intro}
+
+Given the broad set of algorithms and methods for machine learning and analytics, there is value in understanding and interpreting the variation between different data science models.
+The purpose of this study will be to analyze the effectiveness of distinct algorithm types on structured, tabular data.
+This comparison of algorithms will focus on variation in loss during testing and variation in loss between test runs.
+
+Our team plans to implement fully developed algorithms for five types of classification models: Linear Discriminant Analysis (LDA), Logistic Regression, Gradient Boosting, Random Forest, and Naive Bayesian.
+This will require significant time spent learning the methods, developing the algorithm structure, training the model, running validation checks for correct implementation and debugging based on errors before implementing on test data.
+Given the extensive labor involved in accomplishing all these tasks, we will also identify available repositories for implementing these algorithms readily for those that we are unable to develop in a timely manner.
+
+Three of the selected classifier tools are methods that were not covered in class, so there is background, research, and theory that must be reviewed in order to qualitatively analyze each model’s effectiveness.
+The new methods are all similar in that the algorithms work most effectively on structured, tabular data, so we will focus on gathering formatted data which we can provide directly to the models with minimal pre-processing.
+Each method will be discussed and assessed based on the same training and test data which will serve as controls on the implementation and should standardize the results for comparison.
+Additionally, each member of the team will gain a deep understanding of one of the chosen methods independently and provide this insight to the team during the comparative analysis.
+
+
+\section{Literature Review}
+\label{sec:related}
+
+Three of the five models we will be implementing are not covered in class.
+Therefore, in addition to implementing the models, we will also be reviewing the literature on the methods to gain a deeper understanding of the models and their applications.
+This is vital for implementing the models correctly, explaining the methods in the report, giving intuition for the results, and explaining the algorithms in the presentation.
+
+\subsection{Gradient Boosting}
+
+Gradient boosting is a machine learning technique, first introduced in 1999 by Jerome H. Friedman \cite{gradientboosting} that builds an ensemble of predictive models, typically decision trees, in a sequential manner.
+Each new tree aims to correct the errors of the preceding ones.
+The algorithm learns by fitting subsequent trees to the residual errors of the combined ensemble of existing trees.
+This iterative correction process often results in high accuracy with appropriate tuning.
+
+In contrast, random forests also build ensembles of decision trees but do so in parallel.
+Each tree in a random forest is trained independently, using a bootstrap sample of the data and a random subset of features.
+This randomness introduces diversity among the trees, helping the ensemble to reduce variance without increasing bias.
+
+Gradient boosting machines though an older machine learning technique have shown in practical applications to be one of the best models for tabular data winning many Kaggle data science competitions.
+The success is so wide reaching that the CEO of Kaggle has noted its wide success in its competitions, specifically the XGBoost \cite{xgboost} python library during an interview in the weights and biases podcast \cite{kaggle}.
+
+\subsection{Random Forests}
+
+The original Random Forest methodology was developed by Leo Breiman in his paper, “Random Forests”, in 2001 \cite{randomforest}.
+It provides an understanding of the classification method of developing tree structures and the effective convergence of “randomly” selected partitions.
+Particularly, it notes the improvements in comparison to other contemporary methods, particularly in data estimation and computational intensity.
+
+Gerard Biau and Erwan Scornet provide “A Random Forest Guided Tour” for understanding the theory, intuitive process and implementation practices for the Random Forest methodology \cite{randomforesttour}.
+While this paper focuses on the regression method, the paper facilitates understanding the classification method.
+The key parameters that impact results of the random forest algorithm are the selected sample points, the directionality of node splitting and the leaf size.
+
+These parameters effectively allow the data set to be divided into smaller and smaller subsets until a final tree structure is developed.
+In a regression model, this would lead to a linear model, but the classification model can be similarly developed by varying the final leaf sizes and determining the lowest loss structure in the training set.
+
+\subsection{Naive Bayes}
+
+The Naive Bayesian classification is a probabilistic classification model that leverages prior conditional probabilities of features while assuming all probabilities to be mutually independent - hence the “naive” in its name.
+Despite its simplicity, it has been found to perform well \cite{domingos,webb}. 
+
+The algorithm works by first training on a labeled dataset to estimate the conditional probabilities of each feature given each class.
+In order to formulate class predictions, it finds the probability of each instance belonging to each class and classifies based on an objective function.
+Typically this objective function is either the argmax of the probability or minimizing the probability of misclassification.
+The simplicity and speed of the Naive Bayes classifier make it particularly suitable for text classification tasks.
+However, due to its “naivety,” it will struggle on datasets when the independence assumption is strongly violated in the data (such as medical diagnoses), and it’s not well-suited for complex relationships in high-dimensional data.
+
+
+\section{Datasets}
+
+Due to the nature of the algorithms we are investigating, we will be focusing on tabular data.
+This is because the algorithms we are investigating are designed to work on classification problems and is easy to implement on tabular data.
+To this end we have selected four datasets that are tabular in nature and have a classification problem associated with them.
+
+\subsection{Housing prices \cite{ds1}}
+
+The housing prices data set provides a feature set for 1,000 homes which includes the following features: square footage, number of bedrooms, number of bathrooms, zip code, year built, and sale price.
+All but one of these features are numerical, which makes pre-processing of the data easier.
+Additionally, this is a small and simple data set, so it is our first candidate for implementing the three algorithms we have selected: Gradient Boosting, Random Forests, and Naive Bayes.
+Since these methods offer slightly different benefits, it will be a good starting point for interpreting the variation between these methods with an easily parsable dataset.
+
+\subsection{Heart Attack Analysis \& Prediction Dataset \cite{ds2}}
+
+This dataset includes features like age, sex, chest pain type, exercise-induced angina, and cholesterol levels, and is ideal for heart attack risk prediction using machine learning algorithms such as Gradient Boosting, Random Forests, and Naive Bayes.
+Gradient Boosting iteratively refines predictions using an ensemble of weak models, focusing on correcting previous errors.
+Random Forests employ multiple decision trees on varied data subsets, averaging their outcomes for robust predictions and reduced overfitting.
+Naive Bayes, despite its simplicity and assumption of feature independence, effectively calculates heart attack probability based on feature presence.
+Each method involves preprocessing the data, model training, and performance evaluation using metrics like accuracy and ROC-AUC to predict the likelihood of a heart attack.
+
+\subsection{Rain in Australia \cite{ds3}}
+
+This dataset, aims to predict the rain tomorrow, and encompasses diverse weather-related features like temperatures (MinTemp, MaxTemp), Rainfall, Evaporation, Sunshine, wind attributes (6 features), humidity levels (2 features), atmospheric pressure (2 features), cloud cover (2 features), and temperature readings at different times of day (2 features), along with RainToday.
+For predictive modeling, Gradient Boosting would sequentially refine predictions through iterative error correction, ideal for this dataset’s varied features.
+Random Forests, with multiple decision trees on different data subsets, would offer robustness and reduce overfitting, capturing complex interactions among features like wind, humidity, and pressure.
+Naive Bayes provides a simpler, baseline model, estimating rain likelihood based on individual feature presence.
+The methodology includes data preprocessing, model training, and evaluation using metrics like accuracy and precision, making this dataset a valuable resource for weather forecasting and climate studies.
+
+\subsection{Campus Recruitment \cite{ds4}}
+
+This dataset contains features like educational scores, work experience, and specialization, machine learning algorithms like Gradient Boosting, Random Forests, and Naive Bayes can be utilized for predictive analysis.
+Gradient Boosting would progressively refine predictions using an ensemble of models, effectively handling diverse data types.
+Random Forests, through numerous decision trees on varied subsets, would offer robust predictions, ideal for capturing the complex interplay of academic and professional features.
+Naive Bayes, simpler but effective, would estimate probabilities for outcomes like employment status or salary, based on the independence of features such as gender, education, and work experience.
+
+\subsection{Data Processing}
+
+The data has features of different scales and domains.
+There are categorical features and real valued features.
+In order to normalize the features we are scaling the features to be mean zero and unit standard deviation.
+This is a common practice in order to ensure models can attend to each feature fairly and generally simplifies the learning task.
+This has a less clear interpretation for categorical features so additional time will need to be spent ensuring this is acceptable for such features.
+Currently, all the datasets are processed this way for the current progress on training.
+
+
+\section{Training}
+
+Currently we are working on training the various classifiers with established implementations found in SKlearn.
+They have pre-existing implementations for all three methods we are investigating; Gradient Boosting, Random Forests and Naive Bayes.
+Though with 4 datasets and three methods there are a lot of combinations to compare and profile.
+Therefore this is still a work in progress.
+
+As we work on developing our implementations, we will be able to begin comparative analysis between the established implementations and our developed version.
+By having a check for our results, the process of debugging and correcting our implementations will be simplified.
+Deterministic analysis between methods will allow us to determine convergence of our algorithms.
+Any variation in results could be a difference in implementation which will be an opportunity to reflect on the potential diversity that can be achieved through independent algorithm development.
+
+
+\section{Division of Labor}
+
+In this section we will outline the division of labor for the project.
+Each team member will be responsible for implementing one/two of the five models.
+Additionally one member will be responsible for data collection and sanitizing it for use in the models.
+All members have collectively agreed on this division of labor and have agreed to help each other as needed.
+Additionally anything that falls out of the points mentioned here will be handled by the team as a whole.
+
+\subsection{Evan Donovan}
+\begin{enumerate}
+  \item Random Forest
+  \item Linear Discriminant Analysis
+\end{enumerate}
+
+\subsection{Mitchell Gilmore}
+\begin{enumerate}
+  \item Gradient Boosting
+  \item Logistic Regression
+\end{enumerate}
+
+\subsection{William Harrington}
+\begin{enumerate}
+  \item Naive Bayes
+  \item Data Collection
+\end{enumerate}
+
+{
+  \small
+  \bibliographystyle{assets/ieee_fullname}
+  \bibliography{assets/Project}
+}
+
+\end{document}
