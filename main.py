@@ -1,7 +1,8 @@
 import argparse
 
 def download_callback():
-    pass
+    import utils
+    utils.download_all()
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 
