@@ -12,9 +12,11 @@ pip install -r requirements.txt
 ## Downloading the data
 
 All data is stored on Kaggle and can be downloaded using the Kaggle API.
-Simply ensure you have the [Kaggle API key](https://www.kaggle.com/docs/api#authentication) is downloaded and stored in the`~/.kaggle/` directory.
+Simply ensure your [Kaggle API key](https://www.kaggle.com/docs/api#authentication) is downloaded and stored in the `~/.kaggle/` directory.
 Then, run the following commands:
 
 ```bash
 python main.py download
 ```
+
+This generates the `data/` directory and downloads the data into it.
