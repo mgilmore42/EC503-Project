@@ -118,10 +118,10 @@ class Dataset:
         Returns:
             tuple[pl.DataFrame, pl.DataFrame]: A tuple of features and ground-truth.
         """
-        if ommit_nan:
-            return self.df[features].drop_nulls(), self.df[gt].drop_nulls()
-        else:
-            return self.df[features], self.df[gt]
+
+        data = self.df.drop_nulls() if ommit_nan else self.df
+
+        return data[features], data[gt]
     
     def _remove(self, col: str, *args: str):
         """
