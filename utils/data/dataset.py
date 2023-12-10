@@ -193,7 +193,7 @@ class HeartDataset(Dataset):
         self._make_normalization('age')
         self._make_normalization('trtbps')
         self._make_normalization('chol')
-        self._make_normalization('thalachh')
+        self._make_normalization('thalach')
 
 class HousingDataset(Dataset):
 
