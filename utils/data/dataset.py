@@ -135,7 +135,7 @@ class Dataset:
 
         self.df = self.df.drop(col, *args)
     
-    def save(self, fname: str):
+    def save(self, fname: str, ommit_nan: bool = False):
         """
         Save the DataFrame to a CSV file.
 
@@ -148,7 +148,10 @@ class Dataset:
             None
         """
 
-        self.df.to_csv(fname)
+        if ommit_nan:
+            self.df.drop_nulls().to_csv(fname)
+        else:
+            self.df.to_csv(fname)
 
 class CampusDataset(Dataset):
 
