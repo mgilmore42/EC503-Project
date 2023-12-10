@@ -20,3 +20,49 @@ python main.py download
 ```
 
 This generates the `data/` directory and downloads the data into it.
+
+
+
+Proposed File Structure
+project-root/
+│
+├── data/
+│   ├── dataset1/
+│   │   ├── raw/
+│   │   ├── processed/
+│   │   └── ...
+│   ├── dataset2/
+│   │   ├── raw/
+│   │   ├── processed/
+│   │   └── ...
+│   ├── dataset3/
+│   │   ├── raw/
+│   │   ├── processed/
+│   │   └── ...
+│   ├── dataset4/
+│       ├── raw/
+│       ├── processed/
+│       └── ...
+│
+├── src/
+│   ├── algorithms/
+│   │   ├── algorithm1/
+│   │   ├── algorithm2/
+│   │   ├── algorithm3/
+│   │   └── algorithm4/
+│   ├── utils/
+│   └── main.py
+│
+├── results/
+│   ├── algorithm1/
+│   ├── algorithm2/
+│   ├── algorithm3/
+│   └── algorithm4/
+│
+├── notebooks/
+│   ├── exploration.ipynb
+│   └── visualization.ipynb
+│
+├── requirements.txt
+├── README.md
+└── .gitignore
