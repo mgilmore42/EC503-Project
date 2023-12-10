@@ -120,7 +120,7 @@ class Dataset:
         """
         return self.df[features], self.df[gt]
     
-    def _remove(self, col: str):
+    def _remove(self, col: str, *args: str):
         """
         Remove a column from the DataFrame.
 
@@ -133,7 +133,7 @@ class Dataset:
             None
         """
 
-        self.df = self.df.drop(col)
+        self.df = self.df.drop(col, *args)
     
     def save(self, fname: str):
         """
@@ -230,7 +230,7 @@ class RainDataset(Dataset):
 
         super().__init__('data/rain/weatherAUS.csv')
 
-        self._remove('Date')
+        self._remove('Date', 'Evaporation', 'Sunshine', 'Cloud3pm', 'Cloud9am')
         self._make_normalization('WindGustDir')
         self._make_normalization('WindGustSpeed')
         self._make_normalization('WindDir9am')
