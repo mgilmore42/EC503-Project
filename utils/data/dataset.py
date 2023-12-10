@@ -104,7 +104,7 @@ class Dataset:
 
         self.df = self.df.with_columns((data - data.mean()) / data.std())
     
-    def get(self, gt: list[str], features: list[str]) -> tuple[pl.DataFrame, pl.DataFrame]:
+    def get(self, gt: list[str], features: list[str], ommit_nan: bool = False) -> tuple[pl.DataFrame, pl.DataFrame]:
         """
         Get the dataset as a tuple of features and ground-truth.
 
@@ -118,7 +118,10 @@ class Dataset:
         Returns:
             tuple[pl.DataFrame, pl.DataFrame]: A tuple of features and ground-truth.
         """
-        return self.df[features], self.df[gt]
+        if ommit_nan:
+            return self.df[features].drop_nulls(), self.df[gt].drop_nulls()
+        else:
+            return self.df[features], self.df[gt]
     
     def _remove(self, col: str, *args: str):
         """
