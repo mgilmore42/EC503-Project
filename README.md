@@ -22,8 +22,9 @@ python main.py download
 This generates the `data/` directory and downloads the data into it.
 
 
-
 Proposed File Structure
+
+```
 project-root/
 │
 ├── data/
@@ -66,3 +67,4 @@ project-root/
 ├── requirements.txt
 ├── README.md
 └── .gitignore
+```
