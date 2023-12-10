@@ -150,3 +150,92 @@ class Dataset:
 
         self.df.to_csv(fname)
 
+class CampusDataset(Dataset):
+
+    def __init__(self):
+        """
+        Initialize a CampusDataset object.
+
+        This method initializes a CampusDataset object by reading the dataset from the specified
+        file name. It also normalizes the numerical columns and converts the categorical columns to
+        numerical representation.
+
+        Returns:
+            None
+        """
+
+        super().__init__('data/campus/Placement_Data_Full_Class.csv')
+        self._remove('sl_no')
+        self._make_normalization('salary')
+
+class HeartDataset(Dataset):
+
+    def __init__(self):
+        """
+        Initialize a HeartDataset object.
+
+        This method initializes a HeartDataset object by reading the dataset from the specified
+        file name. It also normalizes the numerical columns and converts the categorical columns to
+        numerical representation.
+
+        Returns:
+            None
+        """
+
+        super().__init__('data/heart/heart.csv')
+
+        self._make_normalization('age')
+        self._make_normalization('trtbps')
+        self._make_normalization('chol')
+        self._make_normalization('thalachh')
+
+class HousingDataset(Dataset):
+
+    def __init__(self):
+        """
+        Initialize a HousingDataset object.
+
+        This method initializes a HousingDataset object by reading the dataset from the specified
+        file name. It also normalizes the numerical columns and converts the categorical columns to
+        numerical representation.
+
+        Returns:
+            None
+        """
+
+        super().__init__('data/housing/housePrices.csv')
+
+        self._make_categorical('Zip')
+        self._make_normalization('Year')
+        self._make_categorical('Beds')
+        self._make_categorical('Baths')
+        self._make_normalization('Living_Space_sq_ft')
+        self._make_normalization('SalePrice')
+
+        self._remove('Index')
+
+class RainDataset(Dataset):
+
+    def __init__(self):
+        """
+        Initialize a RainDataset object.
+
+        This method initializes a RainDataset object by reading the dataset from the specified
+        file name. It also normalizes the numerical columns and converts the categorical columns to
+        numerical representation.
+
+        Returns:
+            None
+        """
+
+        super().__init__('data/rain/weatherAUS.csv')
+
+        self._remove('Date')
+        self._make_normalization('WindGustDir')
+        self._make_normalization('WindGustSpeed')
+        self._make_normalization('WindDir9am')
+        self._make_normalization('WindSpeed9am')
+        self._make_normalization('WindDir3pm')
+        self._make_normalization('WindSpeed3pm')
+        self._make_normalization('Humidity9am')
+        self._make_normalization('Humidity3pm')
