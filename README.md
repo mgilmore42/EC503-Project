@@ -22,28 +22,16 @@ python main.py download
 This generates the `data/` directory and downloads the data into it.
 
 
-Proposed File Structure
+Folder Structure
 
 ```
 project-root/
 │
 ├── data/
 │   ├── dataset1/
-│   │   ├── raw/
-│   │   ├── processed/
-│   │   └── ...
 │   ├── dataset2/
-│   │   ├── raw/
-│   │   ├── processed/
-│   │   └── ...
 │   ├── dataset3/
-│   │   ├── raw/
-│   │   ├── processed/
-│   │   └── ...
-│   ├── dataset4/
-│       ├── raw/
-│       ├── processed/
-│       └── ...
+│   └── dataset4/
 │
 ├── src/
 │   ├── algorithms/
