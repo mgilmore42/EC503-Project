@@ -9,7 +9,7 @@ from pprint import pprint
 from sklearn.model_selection import train_test_split
 
 from utils.data import HeartDataset, HousingDataset, RainDataset, CampusDataset
-
+import time
 import polars as pl
 
 def train_gradient_boosting_classifier(X, y, n_estimators=100):
@@ -81,7 +81,7 @@ def train_random_forest_classifier(X, y, n_estimators=100):
 
     return rfc
 
-def train_support_vector_classifier(X, y):
+def train_support_vector_classifier(X, y, kernel):
     """
     Train a Support Vector Classifier.
 
@@ -97,7 +97,7 @@ def train_support_vector_classifier(X, y):
     """
 
     # Create a Support Vector Classifier
-    svc = SVC(gamma='auto', random_state=42)
+    svc = SVC(kernel=kernel, gamma='auto', random_state=42)
 
     # Train the classifier
     svc.fit(X, y)
@@ -127,7 +127,7 @@ def train_neural_network_classifier(X, y):
 
     return nnc
 
-def train_all_classifiers(X, y, n_estimators=100):
+def train_all_classifiers(X, y, n_estimators=100, kernel='rbf'):
     """
     Train all the classifiers on the given dataset.
 
@@ -142,39 +142,58 @@ def train_all_classifiers(X, y, n_estimators=100):
     models: A dictionary of all the trained models.
     """
 
-    models = {}
+    training_times = {}
 
+    start_time = time.time()
     gbc = train_gradient_boosting_classifier(X, y, n_estimators=n_estimators)
+    training_times['GradientBoosting'] = time.time() - start_time
+
+    start_time = time.time()
     lrc = train_logistic_regression(X, y)
+    training_times['LogisticRegression'] = time.time() - start_time
+
+    start_time = time.time()
     rfc = train_random_forest_classifier(X, y, n_estimators=n_estimators)
-    svc = train_support_vector_classifier(X, y)
+    training_times['RandomForest'] = time.time() - start_time
+
+    start_time = time.time()
+    svc = train_support_vector_classifier(X, y, kernel)
+    training_times['SupportVector'] = time.time() - start_time
+
+    start_time = time.time()
     nnc = train_neural_network_classifier(X, y)
+    training_times['NeuralNetwork'] = time.time() - start_time
 
-    return gbc, lrc, rfc, svc, nnc
+    return gbc, lrc, rfc, svc, nnc, training_times
 
-def get_accuracy(X_train, y_train, X_test, y_test, gbc, lrc, rfc, svc, nnc):
+def get_accuracy(X_train, y_train, X_test, y_test, gbc, lrc, rfc, svc, nnc, training_times):
 
     metrics = OrderedDict(
-        accuracy = ['test', 'train'],
+        accuracy = ['test', 'train', 'training time'],
         grad_boost = [
             gbc.score(X_test, y_test),
-            gbc.score(X_train, y_train)
+            gbc.score(X_train, y_train),
+            training_times['GradientBoosting']
         ],
         log_reg = [
             lrc.score(X_test, y_test),
-            lrc.score(X_train, y_train)
+            lrc.score(X_train, y_train),
+            training_times['LogisticRegression']
         ],
         rand_forest = [
             rfc.score(X_test, y_test),
-            rfc.score(X_train, y_train)
+            rfc.score(X_train, y_train),
+            training_times['RandomForest']
         ],
         svc = [
             svc.score(X_test, y_test),
-            svc.score(X_train, y_train)
+            svc.score(X_train, y_train),
+            training_times['SupportVector']
         ],
         neural_net = [
             nnc.score(X_test, y_test),
-            nnc.score(X_train, y_train)
+            nnc.score(X_train, y_train),
+            training_times['NeuralNetwork']
         ]
     )
 
@@ -191,7 +210,7 @@ def train_campus():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    classifiers = train_all_classifiers(X_train, y_train)
+    classifiers = train_all_classifiers(X_train, y_train, kernel='linear')
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
@@ -211,7 +230,7 @@ def train_heart():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    classifiers = train_all_classifiers(X_train, y_train)
+    classifiers = train_all_classifiers(X_train, y_train, kernel='poly')
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
@@ -231,7 +250,7 @@ def train_rain():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    classifiers = train_all_classifiers(X_train, y_train, n_estimators=5_000)
+    classifiers = train_all_classifiers(X_train, y_train, n_estimators=5_000, kernel='linear')
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
@@ -251,7 +270,7 @@ def train_housing():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    classifiers = train_all_classifiers(X_train, y_train)
+    classifiers = train_all_classifiers(X_train, y_train, kernel='poly')
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
@@ -283,4 +302,29 @@ def plot_decision_boundary(model, X, y):
     plt.ylim(yy.min(), yy.max())
     plt.show()
 
-plot_decision_boundary(model, X, y)
+
+def confusion_matrix_table(model, X_test, y_test):
+    """
+    Generate a simple table representation of the confusion matrix.
+
+    Parameters:
+    - model: The trained classification model.
+    - X_test: Test features.
+    - y_test: True labels for the test set.
+
+    Returns:
+    - Confusion matrix table.
+    """
+
+    # Predictions
+    y_pred = model.predict(X_test)
+
+    # Calculate confusion matrix
+    cm = confusion_matrix(y_test, y_pred)
+
+    # Convert to DataFrame for better visualization
+    cm_df = pd.DataFrame(cm, columns=model.classes_, index=model.classes_)
+    return cm_df
+
+
+# plot_decision_boundary(model, X, y)
