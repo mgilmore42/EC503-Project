@@ -1,11 +1,18 @@
-from sklearn.ensemble import GradientBoostingClassifier
+from collections import OrderedDict
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.neural_network import MLPClassifier
+
+from pprint import pprint
 
 from sklearn.model_selection import train_test_split
 
 from utils.data import HeartDataset, HousingDataset, RainDataset, CampusDataset
 
-def train_gradient_boosting_classifier(X, y):
+import polars as pl
+
+def train_gradient_boosting_classifier(X, y, n_estimators=100):
     """
     Train a Gradient Boosting Classifier.
 
@@ -21,12 +28,157 @@ def train_gradient_boosting_classifier(X, y):
     """
 
     # Create a Gradient Boosting Classifier
-    gbc = GradientBoostingClassifier(n_estimators=1_000, learning_rate=1e0, max_depth=1, random_state=42)
+    gbc = GradientBoostingClassifier(n_estimators=n_estimators, learning_rate=1e0, max_depth=1, random_state=42)
 
     # Train the classifier
     gbc.fit(X, y)
 
     return gbc
+
+def train_logistic_regression(X, y):
+    """
+    Train a Logistic Regression Classifier.
+
+    Parameters:
+    X: array-like, shape = [n_samples, n_features]
+       Training vectors, where n_samples is the number of samples and
+       n_features is the number of features.
+    y: array-like, shape = [n_samples]
+       Target values (class labels in classification).
+
+    Returns:
+    model: The trained Logistic Regression Classifier model.
+    """
+
+    # Create a Logistic Regression Classifier
+    lrc = LogisticRegression(max_iter=2_000, random_state=42)
+
+    # Train the classifier
+    lrc.fit(X, y)
+
+    return lrc
+
+def train_random_forest_classifier(X, y, n_estimators=100):
+    """
+    Train a Random Forest Classifier.
+
+    Parameters:
+    X: array-like, shape = [n_samples, n_features]
+       Training vectors, where n_samples is the number of samples and
+       n_features is the number of features.
+    y: array-like, shape = [n_samples]
+       Target values (class labels in classification).
+
+    Returns:
+    model: The trained Random Forest Classifier model.
+    """
+
+    # Create a Random Forest Classifier
+    rfc = RandomForestClassifier(n_estimators=n_estimators, random_state=42)
+
+    # Train the classifier
+    rfc.fit(X, y)
+
+    return rfc
+
+def train_support_vector_classifier(X, y):
+    """
+    Train a Support Vector Classifier.
+
+    Parameters:
+    X: array-like, shape = [n_samples, n_features]
+       Training vectors, where n_samples is the number of samples and
+       n_features is the number of features.
+    y: array-like, shape = [n_samples]
+       Target values (class labels in classification).
+
+    Returns:
+    model: The trained Support Vector Classifier model.
+    """
+
+    # Create a Support Vector Classifier
+    svc = SVC(gamma='auto', random_state=42)
+
+    # Train the classifier
+    svc.fit(X, y)
+
+    return svc
+
+def train_neural_network_classifier(X, y):
+    """
+    Train a Neural Network Classifier.
+
+    Parameters:
+    X: array-like, shape = [n_samples, n_features]
+       Training vectors, where n_samples is the number of samples and
+       n_features is the number of features.
+    y: array-like, shape = [n_samples]
+       Target values (class labels in classification).
+
+    Returns:
+    model: The trained Neural Network Classifier model.
+    """
+
+    # Create a Neural Network Classifier
+    nnc = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 5, 5), max_iter=2_000, random_state=42)
+
+    # Train the classifier
+    nnc.fit(X, y)
+
+    return nnc
+
+def train_all_classifiers(X, y, n_estimators=100):
+    """
+    Train all the classifiers on the given dataset.
+
+    Parameters:
+    X: array-like, shape = [n_samples, n_features]
+       Training vectors, where n_samples is the number of samples and
+       n_features is the number of features.
+    y: array-like, shape = [n_samples]
+       Target values (class labels in classification).
+
+    Returns:
+    models: A dictionary of all the trained models.
+    """
+
+    models = {}
+
+    gbc = train_gradient_boosting_classifier(X, y, n_estimators=n_estimators)
+    lrc = train_logistic_regression(X, y)
+    rfc = train_random_forest_classifier(X, y, n_estimators=n_estimators)
+    svc = train_support_vector_classifier(X, y)
+    nnc = train_neural_network_classifier(X, y)
+
+    return gbc, lrc, rfc, svc, nnc
+
+def get_accuracy(X_train, y_train, X_test, y_test, gbc, lrc, rfc, svc, nnc):
+
+    metrics = OrderedDict(
+        accuracy = ['test', 'train'],
+        grad_boost = [
+            gbc.score(X_test, y_test),
+            gbc.score(X_train, y_train)
+        ],
+        log_reg = [
+            lrc.score(X_test, y_test),
+            lrc.score(X_train, y_train)
+        ],
+        rand_forest = [
+            rfc.score(X_test, y_test),
+            rfc.score(X_train, y_train)
+        ],
+        svc = [
+            svc.score(X_test, y_test),
+            svc.score(X_train, y_train)
+        ],
+        neural_net = [
+            nnc.score(X_test, y_test),
+            nnc.score(X_train, y_train)
+        ]
+    )
+
+    return pl.DataFrame(metrics)
 
 def train_campus():
 
@@ -39,17 +191,14 @@ def train_campus():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    gbc = train_gradient_boosting_classifier(X_train, y_train)
+    classifiers = train_all_classifiers(X_train, y_train)
 
-    metrics = {}
-
-    metrics['grad_boost'] = {
-        'test_accuracy': gbc.score(X_test, y_test),
-        'train_accuracy': gbc.score(X_train, y_train)
-    }
+    metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
     print('Campus Placement Dataset')
     print(metrics)
+    print()
+    print()
 
 def train_heart():
     
@@ -62,17 +211,14 @@ def train_heart():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    gbc = train_gradient_boosting_classifier(X_train, y_train)
+    classifiers = train_all_classifiers(X_train, y_train)
 
-    metrics = {}
-
-    metrics['grad_boost'] = {
-        'test_accuracy': gbc.score(X_test, y_test),
-        'train_accuracy': gbc.score(X_train, y_train)
-    }
+    metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
     print('Heart Disease Dataset')
     print(metrics)
+    print()
+    print()
 
 def train_rain():
 
@@ -85,17 +231,14 @@ def train_rain():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    gbc = train_gradient_boosting_classifier(X_train, y_train)
+    classifiers = train_all_classifiers(X_train, y_train, n_estimators=5_000)
 
-    metrics = {}
-
-    metrics['grad_boost'] = {
-        'test_accuracy': gbc.score(X_test, y_test),
-        'train_accuracy': gbc.score(X_train, y_train)
-    }
+    metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
     print('Rain Dataset')
     print(metrics)
+    print()
+    print()
 
 def train_housing():
 
@@ -108,17 +251,14 @@ def train_housing():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    gbc = train_gradient_boosting_classifier(X_train, y_train)
+    classifiers = train_all_classifiers(X_train, y_train)
 
-    metrics = {}
-
-    metrics['grad_boost'] = {
-        'test_accuracy': gbc.score(X_test, y_test),
-        'train_accuracy': gbc.score(X_train, y_train)
-    }
+    metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
     print('Housing Dataset')
     print(metrics)
+    print()
+    print()
 
 def train_all():
     train_campus()
