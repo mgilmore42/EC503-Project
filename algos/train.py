@@ -265,3 +265,22 @@ def train_all():
     train_heart()
     train_rain()
     train_housing()
+
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.inspection import DecisionBoundaryDisplay
+
+def plot_decision_boundary(model, X, y):
+    X_min, X_max = X[:, 0].min() - 0.1, X[:, 0].max() + 0.1
+    y_min, y_max = X[:, 1].min() - 0.1, X[:, 1].max() + 0.1
+    xx, yy = np.meshgrid(np.linspace(X_min, X_max, 100),
+                         np.linspace(y_min, y_max, 100))
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
+    plt.contourf(xx, yy, Z, alpha=0.4)
+    plt.scatter(X[:, 0], X[:, 1], c=y, s=20, edgecolor='k')
+    plt.xlim(xx.min(), xx.max())
+    plt.ylim(yy.min(), yy.max())
+    plt.show()
+
+plot_decision_boundary(model, X, y)
