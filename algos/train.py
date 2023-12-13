@@ -202,7 +202,7 @@ def get_accuracy(X_train, y_train, X_test, y_test, gbc, lrc, rfc, svc, nnc, trai
 def train_campus():
 
     dataset = CampusDataset()
-    
+
     target = 'degree_t'
     features = list(set(dataset.df.columns) - set([target, 'salary']))
 
@@ -270,7 +270,7 @@ def train_housing():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    classifiers = train_all_classifiers(X_train, y_train, kernel='poly')
+    classifiers = train_all_classifiers(X_train, y_train, kernel='rbf')
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
