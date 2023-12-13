@@ -3,3 +3,5 @@ cache_*
 __pycache__
 .venv
 /data
+/results
+*.ipynb

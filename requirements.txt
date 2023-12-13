@@ -1,2 +1,4 @@
 kaggle
 polars
+scikit-learn
+numpy

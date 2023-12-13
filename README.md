@@ -21,38 +21,12 @@ python main.py download
 
 This generates the `data/` directory and downloads the data into it.
 
+## Training the models
 
-Folder Structure
+After downloading the data, you can train the models by running the following command:
 
+```bash
+python main.py train
 ```
-project-root/
-│
-├── data/
-│   ├── dataset1/
-│   ├── dataset2/
-│   ├── dataset3/
-│   └── dataset4/
-│
-├── src/
-│   ├── algorithms/
-│   │   ├── algorithm1/
-│   │   ├── algorithm2/
-│   │   ├── algorithm3/
-│   │   └── algorithm4/
-│   ├── utils/
-│   └── main.py
-│
-├── results/
-│   ├── algorithm1/
-│   ├── algorithm2/
-│   ├── algorithm3/
-│   └── algorithm4/
-│
-├── notebooks/
-│   ├── exploration.ipynb
-│   └── visualization.ipynb
-│
-├── requirements.txt
-├── README.md
-└── .gitignore
-```
+
+Afterwards all the results will be stored in the `results/` directory.
