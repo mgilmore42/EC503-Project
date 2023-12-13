@@ -38,7 +38,7 @@ class Dataset:
         
         for col in self.df.columns:
             if self.df[col].dtype == pl.Utf8:
-                categories = self.df[col].unique().to_list()
+                categories = sorted(self.df[col].unique().to_list(), key=lambda x: (x is None, x))
 
                 self.df = self.df.with_columns(
                     self.df[col].apply(lambda x: categories.index(x))
@@ -194,6 +194,7 @@ class HeartDataset(Dataset):
         self._make_normalization('trtbps')
         self._make_normalization('chol')
         self._make_normalization('thalachh')
+        self._make_categorical('output')
 
 class HousingDataset(Dataset):
 
