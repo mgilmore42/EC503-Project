@@ -16,7 +16,7 @@ import numpy as np
 import os
 
 import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, precision_recall_fscore_support
 
 def train_gradient_boosting_classifier(X, y, n_estimators=100):
     """
@@ -175,30 +175,35 @@ def train_all_classifiers(X, y, n_estimators=100, kernel='rbf'):
 def get_accuracy(X_train, y_train, X_test, y_test, gbc, lrc, rfc, svc, nnc, training_times):
 
     metrics = OrderedDict(
-        accuracy = ['test', 'train', 'training time'],
+        accuracy = ['Test CCR', 'Train CCR', 'Test Precision', 'Test Recall', 'F1 score', 'Training Time'],
         grad_boost = [
             gbc.score(X_test, y_test),
             gbc.score(X_train, y_train),
+            *precision_recall_fscore_support(y_test, gbc.predict(X_test), average='weighted')[:-1],
             training_times['GradientBoosting']
         ],
         log_reg = [
             lrc.score(X_test, y_test),
             lrc.score(X_train, y_train),
+            *precision_recall_fscore_support(y_test, lrc.predict(X_test), average='weighted')[:-1],
             training_times['LogisticRegression']
         ],
         rand_forest = [
             rfc.score(X_test, y_test),
             rfc.score(X_train, y_train),
+            *precision_recall_fscore_support(y_test, rfc.predict(X_test), average='weighted')[:-1],
             training_times['RandomForest']
         ],
         svc = [
             svc.score(X_test, y_test),
             svc.score(X_train, y_train),
+            *precision_recall_fscore_support(y_test, svc.predict(X_test), average='weighted')[:-1],
             training_times['SupportVector']
         ],
         neural_net = [
             nnc.score(X_test, y_test),
             nnc.score(X_train, y_train),
+            *precision_recall_fscore_support(y_test, nnc.predict(X_test), average='weighted')[:-1],
             training_times['NeuralNetwork']
         ]
     )
