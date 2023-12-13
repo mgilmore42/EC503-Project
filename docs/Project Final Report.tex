@@ -117,7 +117,7 @@ In addition to reducing the classification to a binary distinction, the logarith
 It is worth noting that logistic regression is kernelizable although that algorithmic implementation was not analyzed in this study.
 
 
-\section{Datasets}
+\section{Experimental Results}
 
 Due to the nature of the algorithms we are investigating, we will be focusing on tabular data.
 This is because the algorithms we are investigating are designed to work on classification problems and is easy to implement on tabular data.
@@ -130,6 +130,11 @@ All but one of these features are numerical, which makes pre-processing of the d
 Additionally, this is a small and simple data set, so it is our first candidate for implementing the three algorithms we have selected: Gradient Boosting, Random Forests, and Naive Bayes.
 Since these methods offer slightly different benefits, it will be a good starting point for interpreting the variation between these methods with an easily parsable dataset.
 
+\begin{figure}[h]
+  \includegraphics[scale=0.5]{../results/housing/class_balance.png}
+  \caption{Class distribution for number of beds}
+\end{figure}
+
 \subsection{Heart Attack Analysis \& Prediction Dataset \cite{ds2}}
 
 This dataset includes features like age, sex, chest pain type, exercise-induced angina, and cholesterol levels, and is ideal for heart attack risk prediction using machine learning algorithms such as Gradient Boosting, Random Forests, and Naive Bayes.
@@ -137,6 +142,11 @@ Gradient Boosting iteratively refines predictions using an ensemble of weak mode
 Random Forests employ multiple decision trees on varied data subsets, averaging their outcomes for robust predictions and reduced overfitting.
 Naive Bayes, despite its simplicity and assumption of feature independence, effectively calculates heart attack probability based on feature presence.
 Each method involves preprocessing the data, model training, and performance evaluation using metrics like accuracy and ROC-AUC to predict the likelihood of a heart attack.
+
+\begin{figure}[h]
+  \includegraphics[scale=0.5]{../results/heart/class_balance.png}
+  \caption{Class distribution for heart attack risk}
+\end{figure}
 
 \subsection{Rain in Australia \cite{ds3}}
 
@@ -146,12 +156,22 @@ Random Forests, with multiple decision trees on different data subsets, would of
 Naive Bayes provides a simpler, baseline model, estimating rain likelihood based on individual feature presence.
 The methodology includes data preprocessing, model training, and evaluation using metrics like accuracy and precision, making this dataset a valuable resource for weather forecasting and climate studies.
 
+\begin{figure}[h]
+  \includegraphics[scale=0.5]{../results/rain/class_balance.png}
+  \caption{Class distribution for rain tomorrow}
+\end{figure}
+
 \subsection{Campus Recruitment \cite{ds4}}
 
 This dataset contains features like educational scores, work experience, and specialization, machine learning algorithms like Gradient Boosting, Random Forests, and Naive Bayes can be utilized for predictive analysis.
 Gradient Boosting would progressively refine predictions using an ensemble of models, effectively handling diverse data types.
 Random Forests, through numerous decision trees on varied subsets, would offer robust predictions, ideal for capturing the complex interplay of academic and professional features.
 Naive Bayes, simpler but effective, would estimate probabilities for outcomes like employment status or salary, based on the independence of features such as gender, education, and work experience.
+
+\begin{figure}[h]
+  \includegraphics[scale=0.5]{../results/campus/class_balance.png}
+  \caption{Class distribution for degree types}
+\end{figure}
 
 \subsection{Data Processing}
 
@@ -191,19 +211,19 @@ Additionally anything that falls out of the points mentioned here will be handle
 \subsection{Evan Donovan}
 \begin{enumerate}
   \item Random Forest
-  \item Linear Discriminant Analysis
+  \item Logistic Regression
 \end{enumerate}
 
 \subsection{Mitchell Gilmore}
 \begin{enumerate}
   \item Gradient Boosting
-  \item Logistic Regression
+  \item Neural Network
 \end{enumerate}
 
 \subsection{William Harrington}
 \begin{enumerate}
-  \item Naive Bayes
-  \item Data Collection
+  \item Kernel SVM
+  \item Time analysis
 \end{enumerate}
 
 {
