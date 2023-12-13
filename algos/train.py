@@ -204,7 +204,7 @@ def get_accuracy(X_train, y_train, X_test, y_test, gbc, lrc, rfc, svc, nnc, trai
 
     return pl.DataFrame(metrics)
 
-def plot_confusion_matrix(X_test, y_test, basedir, *models):
+def plot_confusion_matrix(X_test, y_test, basedir, labels, *models):
     """
     Generate a Polars DataFrame representation of the confusion matrix.
 
@@ -217,6 +217,8 @@ def plot_confusion_matrix(X_test, y_test, basedir, *models):
     - Confusion matrix table as a Polars DataFrame.
     """
 
+    plt.figure()
+
     os.makedirs(f'{basedir}/confusion', exist_ok=True)
 
     for model, name in zip(models, ['GradientBoosting', 'LogisticRegression', 'RandomForest', 'SupportVector', 'NeuralNetwork']):
@@ -224,11 +226,14 @@ def plot_confusion_matrix(X_test, y_test, basedir, *models):
         # Predictions
         y_pred = model.predict(X_test)
 
+        y_pred_final = [labels[i] for i in y_pred]
+        y_test_final = [labels[i] for i in y_test]
+
         # Calculate confusion matrix
-        cm = confusion_matrix(y_test, y_pred)
+        cm = confusion_matrix(y_test_final, y_pred_final, labels=labels)
 
         # Convert to Polars DataFrame for better visualization
-        cm_df = ConfusionMatrixDisplay(cm)
+        cm_df = ConfusionMatrixDisplay(cm, display_labels=labels)
 
         cm_df.plot()
 
@@ -245,19 +250,20 @@ def train_campus():
 
     y, X = dataset.get(features, target, ommit_nan=True)
 
+    xlabel_ticks = [dataset.categorical[target][i] for i in sorted(y.unique().to_list())]
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     classifiers = train_all_classifiers(X_train, y_train, kernel='linear')
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
-    plot_confusion_matrix(X_test, y_test, 'results/campus', *classifiers)
+    plot_confusion_matrix(X_test, y_test, 'results/campus', xlabel_ticks, *classifiers)
 
     metrics.write_csv('results/campus/metrics.csv')
 
     print('Campus Placement Dataset')
     print(metrics)
-    print(plot_confusion_matrix(classifiers[0], X_test, y_test))
     print()
     print()
 
@@ -272,13 +278,15 @@ def train_heart():
 
     y, X = dataset.get(features, target, ommit_nan=True)
 
+    xlabel_ticks = [dataset.categorical[target][i] for i in sorted(y.unique().to_list())]
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     classifiers = train_all_classifiers(X_train, y_train, kernel='poly')
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
-    plot_confusion_matrix(X_test, y_test, 'results/heart', *classifiers)
+    plot_confusion_matrix(X_test, y_test, 'results/heart', xlabel_ticks, *classifiers)
 
     metrics.write_csv('results/heart/metrics.csv')
 
@@ -298,13 +306,15 @@ def train_rain():
 
     y, X = dataset.get(features, target, ommit_nan=True)
 
+    xlabel_ticks = [dataset.categorical[target][i] for i in sorted(y.unique().to_list())]
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     classifiers = train_all_classifiers(X_train, y_train, n_estimators=500, kernel='linear')
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
-    plot_confusion_matrix(X_test, y_test, 'results/rain', *classifiers)
+    plot_confusion_matrix(X_test, y_test, 'results/rain', xlabel_ticks, *classifiers)
 
     metrics.write_csv('results/rain/metrics.csv')
 
@@ -324,13 +334,15 @@ def train_housing():
 
     y, X = dataset.get(features, target, ommit_nan=True)
 
+    xlabel_ticks = [dataset.categorical[target][i] for i in sorted(y.unique().to_list())]
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     classifiers = train_all_classifiers(X_train, y_train, kernel='rbf')
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
-    plot_confusion_matrix(X_test, y_test, 'results/housing', *classifiers)
+    plot_confusion_matrix(X_test, y_test, 'results/housing', xlabel_ticks, *classifiers)
 
     metrics.write_csv('results/housing/metrics.csv')
 
