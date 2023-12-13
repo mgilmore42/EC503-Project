@@ -12,6 +12,7 @@ from utils.data import HeartDataset, HousingDataset, RainDataset, CampusDataset
 
 from time import perf_counter as time
 import polars as pl
+import numpy as np
 import os
 
 import matplotlib.pyplot as plt
@@ -239,6 +240,31 @@ def plot_confusion_matrix(X_test, y_test, basedir, labels, *models):
 
         plt.savefig(f'{basedir}/confusion/{name}.png')
 
+def plot_class_balance(Y, basedir, xlabel, xlabel_ticks):
+    """
+    Plot the class balance of the given dataset.
+
+    Parameters:
+    - Y: The target variable.
+    """
+
+    plt.figure()
+
+    y_in = Y.to_list()
+
+    counts, bins, patches = plt.hist(y_in, bins=np.arange(min(y_in)-0.5, max(y_in)+1, 1), rwidth=0.5)
+
+    # Add count annotations above each bar
+    for count, bin, patch in zip(counts, bins, patches):
+        if count > 0:
+            plt.text(bin+0.5, patch.get_height(), str(int(count)), ha='center', va='bottom')
+
+    plt.ylabel('Count')
+    plt.xlabel(xlabel)
+    plt.xticks(np.arange(len(Y.unique())), labels=xlabel_ticks)
+
+    plt.savefig(f'{basedir}/class_balance.png')
+
 def train_campus():
 
     os.makedirs('results/campus', exist_ok=True)
@@ -251,6 +277,7 @@ def train_campus():
     y, X = dataset.get(features, target, ommit_nan=True)
 
     xlabel_ticks = [dataset.categorical[target][i] for i in sorted(y.unique().to_list())]
+    plot_class_balance(y, 'results/campus', 'Degree placement', xlabel_ticks)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -279,6 +306,7 @@ def train_heart():
     y, X = dataset.get(features, target, ommit_nan=True)
 
     xlabel_ticks = [dataset.categorical[target][i] for i in sorted(y.unique().to_list())]
+    plot_class_balance(y, 'results/heart', 'Heart Attack Risk', xlabel_ticks)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -307,6 +335,7 @@ def train_rain():
     y, X = dataset.get(features, target, ommit_nan=True)
 
     xlabel_ticks = [dataset.categorical[target][i] for i in sorted(y.unique().to_list())]
+    plot_class_balance(y, 'results/rain', 'Rain Tomorrow', xlabel_ticks)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -335,6 +364,7 @@ def train_housing():
     y, X = dataset.get(features, target, ommit_nan=True)
 
     xlabel_ticks = [dataset.categorical[target][i] for i in sorted(y.unique().to_list())]
+    plot_class_balance(y, 'results/housing', 'Number of Beds', xlabel_ticks)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
