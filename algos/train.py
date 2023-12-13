@@ -9,8 +9,13 @@ from pprint import pprint
 from sklearn.model_selection import train_test_split
 
 from utils.data import HeartDataset, HousingDataset, RainDataset, CampusDataset
-import time
+
+from time import perf_counter as time
 import polars as pl
+import os
+
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 def train_gradient_boosting_classifier(X, y, n_estimators=100):
     """
@@ -144,25 +149,25 @@ def train_all_classifiers(X, y, n_estimators=100, kernel='rbf'):
 
     training_times = {}
 
-    start_time = time.time()
+    start_time = time()
     gbc = train_gradient_boosting_classifier(X, y, n_estimators=n_estimators)
-    training_times['GradientBoosting'] = time.time() - start_time
+    training_times['GradientBoosting'] = time() - start_time
 
-    start_time = time.time()
+    start_time = time()
     lrc = train_logistic_regression(X, y)
-    training_times['LogisticRegression'] = time.time() - start_time
+    training_times['LogisticRegression'] = time() - start_time
 
-    start_time = time.time()
+    start_time = time()
     rfc = train_random_forest_classifier(X, y, n_estimators=n_estimators)
-    training_times['RandomForest'] = time.time() - start_time
+    training_times['RandomForest'] = time() - start_time
 
-    start_time = time.time()
+    start_time = time()
     svc = train_support_vector_classifier(X, y, kernel)
-    training_times['SupportVector'] = time.time() - start_time
+    training_times['SupportVector'] = time() - start_time
 
-    start_time = time.time()
+    start_time = time()
     nnc = train_neural_network_classifier(X, y)
-    training_times['NeuralNetwork'] = time.time() - start_time
+    training_times['NeuralNetwork'] = time() - start_time
 
     return gbc, lrc, rfc, svc, nnc, training_times
 
@@ -199,7 +204,39 @@ def get_accuracy(X_train, y_train, X_test, y_test, gbc, lrc, rfc, svc, nnc, trai
 
     return pl.DataFrame(metrics)
 
+def plot_confusion_matrix(X_test, y_test, basedir, *models):
+    """
+    Generate a Polars DataFrame representation of the confusion matrix.
+
+    Parameters:
+    - model: The trained classification model.
+    - X_test: Test features.
+    - y_test: True labels for the test set.
+
+    Returns:
+    - Confusion matrix table as a Polars DataFrame.
+    """
+
+    os.makedirs(f'{basedir}/confusion', exist_ok=True)
+
+    for model, name in zip(models, ['GradientBoosting', 'LogisticRegression', 'RandomForest', 'SupportVector', 'NeuralNetwork']):
+
+        # Predictions
+        y_pred = model.predict(X_test)
+
+        # Calculate confusion matrix
+        cm = confusion_matrix(y_test, y_pred)
+
+        # Convert to Polars DataFrame for better visualization
+        cm_df = ConfusionMatrixDisplay(cm)
+
+        cm_df.plot()
+
+        plt.savefig(f'{basedir}/confusion/{name}.png')
+
 def train_campus():
+
+    os.makedirs('results/campus', exist_ok=True)
 
     dataset = CampusDataset()
 
@@ -214,12 +251,19 @@ def train_campus():
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
+    plot_confusion_matrix(X_test, y_test, 'results/campus', *classifiers)
+
+    metrics.write_csv('results/campus/metrics.csv')
+
     print('Campus Placement Dataset')
     print(metrics)
+    print(plot_confusion_matrix(classifiers[0], X_test, y_test))
     print()
     print()
 
 def train_heart():
+
+    os.makedirs('results/heart', exist_ok=True)
     
     dataset = HeartDataset()
 
@@ -234,12 +278,18 @@ def train_heart():
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
+    plot_confusion_matrix(X_test, y_test, 'results/heart', *classifiers)
+
+    metrics.write_csv('results/heart/metrics.csv')
+
     print('Heart Disease Dataset')
     print(metrics)
     print()
     print()
 
 def train_rain():
+
+    os.makedirs('results/rain', exist_ok=True)
 
     dataset = RainDataset()
 
@@ -250,9 +300,13 @@ def train_rain():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    classifiers = train_all_classifiers(X_train, y_train, n_estimators=5_000, kernel='linear')
+    classifiers = train_all_classifiers(X_train, y_train, n_estimators=500, kernel='linear')
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
+
+    plot_confusion_matrix(X_test, y_test, 'results/rain', *classifiers)
+
+    metrics.write_csv('results/rain/metrics.csv')
 
     print('Rain Dataset')
     print(metrics)
@@ -260,6 +314,8 @@ def train_rain():
     print()
 
 def train_housing():
+
+    os.makedirs('results/housing', exist_ok=True)
 
     dataset = HousingDataset()
 
@@ -274,6 +330,10 @@ def train_housing():
 
     metrics = get_accuracy(X_train, y_train, X_test, y_test, *classifiers)
 
+    plot_confusion_matrix(X_test, y_test, 'results/housing', *classifiers)
+
+    metrics.write_csv('results/housing/metrics.csv')
+
     print('Housing Dataset')
     print(metrics)
     print()
@@ -284,47 +344,3 @@ def train_all():
     train_heart()
     train_rain()
     train_housing()
-
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.inspection import DecisionBoundaryDisplay
-
-def plot_decision_boundary(model, X, y):
-    X_min, X_max = X[:, 0].min() - 0.1, X[:, 0].max() + 0.1
-    y_min, y_max = X[:, 1].min() - 0.1, X[:, 1].max() + 0.1
-    xx, yy = np.meshgrid(np.linspace(X_min, X_max, 100),
-                         np.linspace(y_min, y_max, 100))
-    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z.reshape(xx.shape)
-    plt.contourf(xx, yy, Z, alpha=0.4)
-    plt.scatter(X[:, 0], X[:, 1], c=y, s=20, edgecolor='k')
-    plt.xlim(xx.min(), xx.max())
-    plt.ylim(yy.min(), yy.max())
-    plt.show()
-
-
-def confusion_matrix_table(model, X_test, y_test):
-    """
-    Generate a simple table representation of the confusion matrix.
-
-    Parameters:
-    - model: The trained classification model.
-    - X_test: Test features.
-    - y_test: True labels for the test set.
-
-    Returns:
-    - Confusion matrix table.
-    """
-
-    # Predictions
-    y_pred = model.predict(X_test)
-
-    # Calculate confusion matrix
-    cm = confusion_matrix(y_test, y_pred)
-
-    # Convert to DataFrame for better visualization
-    cm_df = pd.DataFrame(cm, columns=model.classes_, index=model.classes_)
-    return cm_df
-
-
-# plot_decision_boundary(model, X, y)
